@@ -10,6 +10,18 @@ $result = $con->query("SELECT U.*, P.name, P.name, P.course, P.student_id, P.yea
     }
 }
 
+function isAppended($con, $user_id){
+    $result = $con->query("SELECT * FROM tbl_users WHERE user_id=".$user_id);
+
+    if($result->num_rows > 0){
+        if($row = $result->fetch_assoc()){
+            if ($row['status'] == '1')
+                return true;
+        }
+    }
+    return false;
+}
+
 function showAllUsers($con, $user_id){
     $result = $con->query("SELECT U.*, P.name, P.name, P.course, P.student_id, P.year, R.Title, S.RoleID FROM tbl_users U LEFT JOIN tbl_user_profile P ON U.user_ID=P.user_id LEFT JOIN solar_userroles S ON S.UserID=U.user_ID   LEFT JOIN solar_roles R ON R.ID=S.RoleID");
     if($result->num_rows > 0) {
@@ -192,3 +204,84 @@ function showDescriptionOfUsers($con, $users){
         $i++;
     }
 }
+
+/*Function to get data about projects from database*/
+    function getMyProjects($con, $user_id){
+        $result = array();
+
+        $myOwn = $con->query("SELECT  P.*, D.* FROM solar_projects P LEFT JOIN departments D ON D.DepartmentID= P.department_id WHERE P.author_id=".$user_id);
+        $mySharedProjects = $con->query("SELECT  P.*, PU.*, D.* FROM solar_projects P LEFT JOIN departments D ON D.DepartmentID= P.department_id LEFT JOIN solar_projectsusers PU ON PU.project_id=P.ID WHERE PU.user_id=".$user_id);
+
+        if($myOwn->num_rows >0){
+            while($row = $myOwn->fetch_assoc()){
+                array_push($result, $row);
+            }
+        }
+        if ($mySharedProjects->num_rows > 0){
+            while($row = $mySharedProjects->fetch_assoc()){
+                array_push($result,$row);
+            }
+        }
+        return $result;
+    }
+
+
+/*Get coworkers to project */
+function getProjectCoworkers($con, $project_id){
+    $coworkers = array();
+
+    $result = $con->query("SELECT PU.* , UP.name FROM solar_projectsusers PU LEFT JOIN tbl_user_profile UP ON UP.user_id=PU.user_id WHERE PU.project_id=".$project_id);
+
+    if($result->num_rows >0){
+        while($row = $result->fetch_assoc()){
+            array_push($coworkers, $row);
+        }
+    }
+
+    return $coworkers;
+
+}
+
+/*Function to display users' projects*/
+function displayMyProjects($con, $user_id){
+    $myProjects = getMyProjects($con, $user_id);
+
+
+    for($i =0; $i < count($myProjects);$i++){
+        ?>
+        <div class="card">
+            <div class="card-header" id="heading-project-<?php echo $myProjects[$i]['ID']; ?>">
+                <h5 class="mb-0">
+                    <button class="btn btn-link <?php if($i == 0) echo 'show'; else echo 'collapsed';?>" data-toggle="collapse" data-target="#collapse-project-<?php echo $myProjects[$i]['ID']; ?>" aria-expanded="<?php if($i == 0) echo 'true'; else echo 'false';?>" aria-controls="collapseTwo">
+                        <?php echo $myProjects[$i]['name'];?>
+                    </button>
+                </h5>
+            </div>
+            <div id="collapse-project-<?php echo $myProjects[$i]['ID']; ?>" class="collapse <?php if($i == 0) echo 'show'; else echo 'collapsed';?>" aria-labelledby="heading-project-<?php echo $myProjects[$i]['ID']; ?>" data-parent="#accordion">
+                <div class="card-body">
+                    <?php $coworkers = getProjectCoworkers($con, $myProjects[$i]['ID']);
+                    $author  = getUserData($con, $myProjects[$i]['author_id']);
+                    ?>
+
+                    <p><b>Opis projektu:</b></p>
+                    <p> <?php echo $myProjects[$i]['description'];?></p>
+                    <p> <b>Autor projektu:</b> <?php echo $author['name'];?></p>
+                    <p> <b> Osoby odpowiedzialne za projekt:</b>
+                    <ul>
+
+                        <li> <?php echo $author['name']; ?></li>
+                        <?php
+                            if(count($coworkers) > 0 ){
+                                for($j = 0 ; $j < count($coworkers); $j++){
+                                    echo "<li>".$coworkers[$j]['name']."</li>";
+                                }
+                            }
+                        ?>
+                    </ul>
+                </div>
+            </div>
+        </div>
+<?php
+    }
+}
+?>

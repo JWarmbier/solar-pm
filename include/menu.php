@@ -46,12 +46,14 @@ $tmp = getUserData($con, $_SESSION['UserData']['user_id']);
                 if ($visible)
                     echo '</div></li>';
             }
-            if($tmp['status'] == 1) {
-
+            if(isAppended($con, $_SESSION['UserData']['user_id']) == 1) {
                 ?>
 
                 <li class="nav-item">
                     <a class="nav-link" id="new-user-menu" href="new-project.php">Stwórz projekt</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="my-projects" href="my-projects.php">Moje projekty</a>
                 </li>
                 <?php
             }
