@@ -1,0 +1,89 @@
+/* common css */
+html {
+    font-size: 1rem;
+}
+
+@include media-breakpoint-up(sm) {
+    html {
+        font-size: 1.2rem;
+    }
+}
+
+@include media-breakpoint-up(md) {
+    html {
+        font-size: 1.4rem;
+    }
+}
+
+@include media-breakpoint-up(lg) {
+    html {
+        font-size: 1.6rem;
+    }
+}
+
+body {
+    background-color: #f7f7f7;
+    font-family: 'Roboto', sans-serif;
+
+}
+.modal-content, .form-control, .btn{
+    border-radius: 3px;
+}
+label{
+    font-weight: 400;
+
+}
+.form-control{
+    height: 42px;
+
+}
+.form-control:focus {
+    z-index: 2;
+}
+.alert{
+    border-radius: 3px;
+}
+/* login form css */
+#login_form {
+    max-width: 330px;
+    padding: 15px;
+    margin: 0 auto;
+}
+#login_form .form-control {
+    position: relative;
+    height: auto;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    padding: 10px;
+}
+
+#login_form input[type="email"] {
+    margin-bottom: -1px;
+}
+#login_form input[type="password"] {
+    margin-bottom: 10px;
+}
+#display_error{
+    display: none;
+}
+
+#put-logo {
+    padding: 1em 0 1em 0;
+    width: 150px;
+
+}
+.g-recaptcha{
+    display:inline-block;
+}
+
+.account-view, .new-users, .all-users, .new-project{
+    padding-top: 1em;
+}
+
+.font-weight-light {
+    font-weight: 300 !important;
+}
+.font-weight-medium {
+    font-weight: 300 !important;
+}

@@ -1,0 +1,48 @@
+$rbac = new PhpRbac\Rbac();
+
+// Coordinator
+$rbac->Roles->add("Koordynator", "Osoba odpowiedzialna za cały projekt.", $rbac->Roles->returnId("root"));
+
+// Creating Leaders
+$rbac->Roles->add("Lider Działu Elektrycznego", "Osoba odpowiedzialna za dział elektryczny.", $rbac->Roles->returnId("Koordynator"));
+$rbac->Roles->add("Lider Działu Podwozia", "Osoba odpowiedzialna za dział podwozia.", $rbac->Roles->returnId("Koordynator"));
+$rbac->Roles->add("Lider Działu Nadwozia", "Osoba odpowiedzialna za dział nadwozia.", $rbac->Roles->returnId("Koordynator"));
+$rbac->Roles->add("Lider Działu Marketingu", "Osoba odpowiedzialna za dział marketingu.", $rbac->Roles->returnId("Koordynator"));
+
+// Creating Members
+$rbac->Roles->add("Członek Działu Elektrycznego", "Osoba realizuje projekty w dziale elektrycznym.", $rbac->Roles->returnId("Lider Działu Elektrycznego"));
+$rbac->Roles->add("Członek Działu Podwozia", "Osoba realizuje projekty w dziale podwozia.", $rbac->Roles->returnId("Lider Działu Podwozia"));
+$rbac->Roles->add("Członek Działu Nadwozia", "Osoba realizuje projekty w dziale nadowzia.", $rbac->Roles->returnId("Lider Działu Nadwozia"));
+$rbac->Roles->add("Członek Działu Marketingu", "Osoba realizujące pracy w dziale marketingu", $rbac->Roles->returnId("Lider Działu Marketingu"));
+
+
+//Permissions
+$rbac->Permissions->add('Append new users.', '');
+$rbac->Permissions->add('Change roles', '');
+
+//Permissions-Roles
+$rbac->assign('Koordynator', 'Append new users');
+$rbac->assign('Koordynator', 'Change roles');
+
+//User-Roles
+$rbac->Users->assign('Koordynator', $_SESSION['UserData']['user_id']);
+$rbac->Permissions->add('admin-panel', '');
+$rbac->Permissions->assign('Koordynator', 'admin-panel');
+
+$rbac->Permissions->add('leader-panel', 'Panel lidera');
+$rbac->Roles->assign('Lider Działu Elektrycznego', 'leader-panel');
+$rbac->Roles->assign('Lider Działu Podwozia', 'leader-panel');
+$rbac->Roles->assign('Lider Działu Nadwozia', 'leader-panel');
+$rbac->Roles->assign('Lider Działu Marketingu', 'leader-panel');
+
+$rbac->Permissions->add('department-users', 'Członkowie działu');
+$rbac->Roles->assign('Lider Działu Elektrycznego', 'department-users');
+$rbac->Roles->assign('Lider Działu Podwozia', 'department-users');
+$rbac->Roles->assign('Lider Działu Nadwozia', 'department-users');
+$rbac->Roles->assign('Lider Działu Marketingu', 'department-users');
+
+$rbac->Permissions->add('department-new-users', 'Nowi członkowie działu');
+$rbac->Roles->assign('Lider Działu Elektrycznego', 'department-new-users');
+$rbac->Roles->assign('Lider Działu Podwozia', 'department-new-users');
+$rbac->Roles->assign('Lider Działu Nadwozia', 'department-new-users');
+$rbac->Roles->assign('Lider Działu Marketingu', 'department-new-users');
