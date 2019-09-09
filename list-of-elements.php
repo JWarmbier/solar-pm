@@ -133,7 +133,6 @@ if(isset($_POST['action']) && isset($_POST['element_id'])){
                     <div class="modal-header">
                         <h4 class="modal-title">Dodaj nowy element</h4>
                         <button type="button" class="close" data-dismiss="modal">&times;</button>
-
                     </div>
                     <!-- Modal Body -->
                     <div class="modal-body">

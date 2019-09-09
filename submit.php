@@ -210,3 +210,35 @@ if(!empty($_POST) && $_POST['Action']=='new-element-form'){
     }
     output($Return);
 }
+
+if(!empty($_POST) && $_POST['Action']=='edit-element-form'){
+    $Return = array('result'=>array(), 'error'=>'');
+
+    $element_id = safeInput($con, $_POST['element_id']);
+    $name = safeInput($con, $_POST['el_name']);
+    $category = safeInput($con, $_POST['category']);
+    $parameter = safeInput($con, $_POST['el_parameter']);
+    $amount = safeInput($con, $_POST['el_amount']);
+    $datasheet = safeInput($con, $_POST['datasheet']);
+
+    $res = $con->query("SELECT * FROM solar_elements WHERE element_id=".$element_id);
+
+    if($res->num_rows == 0){
+        $Return[''] = "Nie istnieje już taki element w bazie danych";
+    }
+    elseif( $name === '' or strlen($name) < 3 ){
+        $Return['error'] = "Tytuł musi mieć przynajmniej 2 znaków.";
+    } elseif ($category === '' ) {
+        $Return['error'] = "Kategoria nie została wybrana";
+    } elseif($parameter === ''){
+        $Return['error'] = "Nie wpisano parametru.";
+    }elseif (!preg_match("/^[0-9]/",$amount) or $amount === ''){
+        $Return['error'] = "Ilość musi być liczbą całkowitą";
+    } elseif (strlen($datasheet) < 3){
+        $Return['error'] = "Wpisz link do dokumentacji.";
+    }
+    if($Return['error'] == ''){
+        $con->query ("UPDATE solar_elements SET el_name='$name', el_parameter='$parameter', el_category_id='$category', datasheet='$datasheet', el_amount='$amount' WHERE element_id=".$element_id);
+    }
+    output($Return);
+}

@@ -80,15 +80,16 @@ function getAllRoles($con, $myRole){
 }
 
 /*Get list of categories of elemnts*/
-function getCategories($con){
+function getCategories($con, $selected_id = -1){
     $res =$con->query("SELECT * FROM solar_elementscategories");
     if($res->num_rows >0){
         while($row = $res->fetch_assoc()){
-            echo '<option value="'.$row['category_id'].'">'.$row['category_name'].'</option>';
+            echo '<option value="'.$row['category_id'].'"';
+            if ($selected_id != -1 && $selected_id == $row['category_id']) echo " selected";
+            echo '>'.$row['category_name'].'</option>';
         }
     }
 }
-
 
 /*Function to check if the department exists */
 function isDepartmentID($con, $departmentID){
@@ -308,12 +309,15 @@ function getAllElements($con){
                 echo '<td> '.$element['category_name'].'</td>';
                 echo '<td> <a href="'.$element['datasheet'].'" class="btn btn-primary btn-sm">Dokumentacja</a></td>';
                 ?>
-
                 <td>
-                <form class="element-action" id="element-<?php echo $element['element_id']; ?>" action="list-of-elements.php" method="post">
-                    <input type="hidden" name="element_id" value="<?php echo $element['element_id']; ?>">
-                    <button type="submit" class="btn btn-primary btn-sm" name="action" value="remove-element">Usuń</button>
-                </form>
+                    <form class="element-action float-left" id="element-<?php echo $element['element_id']; ?>" action="edit-element.php" method="post">
+                        <input type="hidden" name="element_id" value="<?php echo $element['element_id']; ?>">
+                        <button type="submit" class="btn btn-primary btn-sm" name="action" value="remove-element">Edytuj</button>
+                    </form>
+                    <form class="element-action float-left" id="element-<?php echo $element['element_id']; ?>" action="list-of-elements.php" method="post">
+                        <input type="hidden" name="element_id" value="<?php echo $element['element_id']; ?>">
+                        <button type="submit" class="btn btn-primary btn-sm" name="action" value="remove-element">Usuń</button>
+                    </form>
                 </td>
                 </tr>
                 <?php
@@ -324,4 +328,13 @@ function getAllElements($con){
 
 function removeElement($con, $element_id){
     $con->query("DELETE FROM solar_elements WHERE element_id=".$element_id);
+}
+
+function getSpecificElement($con, $element_id){
+    $result = $con->query("SELECT * FROM solar_elements WHERE element_id=".$element_id);
+    if($result->num_rows==1){
+        return $result->fetch_assoc();
+    }else{
+        return false;
+    }
 }

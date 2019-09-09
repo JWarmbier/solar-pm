@@ -3,12 +3,9 @@ require('include/header.php');
 require('inc/config.php');
 require('inc/functions.php');
 
-
-
 if (isset($_SESSION['UserData'])) {
     exit(header("location:/solar-pm/"));
 }
-
 ?>
 
 <div class="container text-center">

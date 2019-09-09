@@ -16,12 +16,8 @@ $rbac = new PhpRbac\Rbac();
 
 
 ?>
-
-
     <!-- container -->
     <div class="container">
-
-
         <div class="div-my-projects">
         <h2 class="h2-responsive font-weight-light">Moje projekty</h2>
             <div id="accordion">
@@ -31,7 +27,5 @@ $rbac = new PhpRbac\Rbac();
             </div>
         </div>
     </div>
-
-
     <!-- /container -->
 <?php require('include/footer.php');?>
