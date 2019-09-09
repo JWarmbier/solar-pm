@@ -55,6 +55,9 @@ $tmp = getUserData($con, $_SESSION['UserData']['user_id']);
                 <li class="nav-item">
                     <a class="nav-link" id="my-projects" href="my-projects.php">Moje projekty</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="list-of-elements" href="list-of-elements.php">Spis części</a>
+                </li>
                 <?php
             }
             ?>
