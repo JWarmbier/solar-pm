@@ -79,6 +79,17 @@ function getAllRoles($con, $myRole){
     }
 }
 
+/*Get list of categories of elemnts*/
+function getCategories($con){
+    $res =$con->query("SELECT * FROM solar_elementscategories");
+    if($res->num_rows >0){
+        while($row = $res->fetch_assoc()){
+            echo '<option value="'.$row['category_id'].'">'.$row['category_name'].'</option>';
+        }
+    }
+}
+
+
 /*Function to check if the department exists */
 function isDepartmentID($con, $departmentID){
     $result = $con->query("SELECT * FROM departments WHERE DepartmentID=".$departmentID);
@@ -144,7 +155,6 @@ function showListOfNames($users){
 function removeAccount($con, $user_id){
     $con->query("DELETE FROM tbl_user_profile WHERE user_id=".$user_id);
     $con->query("DELETE FROM tbl_users WHERE user_id=".$user_id);
-
 }
 
 function showDescriptionOfUsers($con, $users){
@@ -158,7 +168,7 @@ function showDescriptionOfUsers($con, $users){
         if($i == 0) echo 'show active';
         echo '" id="list-ID-'.$user['user_id'].'" role="tabpanel" aria-labelledby="list-ID-'.$user['user_id'].'-list">';
         ?>
-         <form calss="profile-form" id="profile-<?php echo $user['user_id']; ?>" action="all-users.php" method="post">
+         <form class="profile-form" id="profile-<?php echo $user['user_id']; ?>" action="all-users.php" method="post">
             <h3 class="h3-responsive font-weight-light" id="name"><?php echo $user['name'];?></h3>
             <hr>
 
@@ -185,14 +195,14 @@ function showDescriptionOfUsers($con, $users){
             <br>
             <input type="hidden" name="user_id" value="<?php echo $user['user_id'];?>">
             <div class="clearfix">
-                <button type="submit" class="btn btn-primary btn float-right" name="action" value="remove-account">Usuń użytkownika</button>
+                <button type="submit" class="btn btn-primary float-right" name="action" value="remove-account">Usuń użytkownika</button>
                 <?php
 
 
                     if(substr_count($tmp['Title'], 'Lider') == 0)
                     {
                 ?>
-                        <button type="submit" class="btn btn-primary btn float-right" name="action" value="change-role" >Zmień funckję</button>
+                        <button type="submit" class="btn btn-primary float-right" name="action" value="change-role" >Zmień funckję</button>
                 <?php
                     }
                 ?>
@@ -284,4 +294,34 @@ function displayMyProjects($con, $user_id){
 <?php
     }
 }
-?>
+function getAllElements($con){
+    $result = $con->query("SELECT E.*, EC.* FROM solar_elements E LEFT JOIN solar_elementscategories EC ON E.el_category_id=EC.category_id");
+    $counter = 1;
+    if($result->num_rows > 0){
+        while($element = $result->fetch_assoc()){
+
+                echo '<tr>';
+                echo '<th scope="row">'.$counter.'</th>';
+                echo '<td> '.$element['el_name'].'</td>';
+                echo '<td> '.$element['el_parameter'].'</td>';
+                echo '<td> '.$element['el_amount'].'</td>';
+                echo '<td> '.$element['category_name'].'</td>';
+                echo '<td> <a href="'.$element['datasheet'].'" class="btn btn-primary btn-sm">Dokumentacja</a></td>';
+                ?>
+
+                <td>
+                <form class="element-action" id="element-<?php echo $element['element_id']; ?>" action="list-of-elements.php" method="post">
+                    <input type="hidden" name="element_id" value="<?php echo $element['element_id']; ?>">
+                    <button type="submit" class="btn btn-primary btn-sm" name="action" value="remove-element">Usuń</button>
+                </form>
+                </td>
+                </tr>
+                <?php
+                $counter++;
+        }
+    }
+}
+
+function removeElement($con, $element_id){
+    $con->query("DELETE FROM solar_elements WHERE element_id=".$element_id);
+}

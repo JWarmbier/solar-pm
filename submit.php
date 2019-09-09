@@ -184,3 +184,29 @@ if(!empty($_POST) && $_POST['Action']=='new-project-form'){
     }
     output($Return);
 }
+
+if(!empty($_POST) && $_POST['Action']=='new-element-form'){
+    $Return = array('result'=>array(), 'error'=>'');
+
+    $name = safeInput($con, $_POST['el_name']);
+    $category = safeInput($con, $_POST['category']);
+    $parameter = safeInput($con, $_POST['el_parameter']);
+    $amount = safeInput($con, $_POST['el_amount']);
+    $datasheet = safeInput($con, $_POST['datasheet']);
+
+    if( $name === '' or strlen($name) < 3 ){
+        $Return['error'] = "Tytuł musi mieć przynajmniej 2 znaków.";
+    } elseif ($category === '' ) {
+        $Return['error'] = "Kategoria nie została wybrana";
+    } elseif($parameter === ''){
+        $Return['error'] = "Nie wpisano parametru.";
+    }elseif (!preg_match("/^[0-9]/",$amount) or $amount === ''){
+        $Return['error'] = "Ilość musi być liczbą całkowitą";
+    } elseif (strlen($datasheet) < 3){
+        $Return['error'] = "Wpisz link do dokumentacji.";
+    }
+    if($Return['error'] == ''){
+        $con->query("INSERT INTO solar_elements(el_name, el_parameter, el_amount, el_category_id, datasheet) VALUeS ('$name','$parameter','$amount','$category','$datasheet')");
+    }
+    output($Return);
+}

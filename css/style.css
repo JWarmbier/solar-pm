@@ -64,7 +64,7 @@ label{
 #login_form input[type="password"] {
     margin-bottom: 10px;
 }
-#display_error{
+#display_error, #amount_error{
     display: none;
 }
 
@@ -77,7 +77,7 @@ label{
     display:inline-block;
 }
 
-.account-view, .new-users, .all-users, .new-project, .div-my-projects{
+.account-view, .new-users, .all-users, .new-project, .div-my-projects, .div-list-of-elements{
     padding-top: 1em;
 }
 
@@ -86,4 +86,10 @@ label{
 }
 .font-weight-medium {
     font-weight: 300 !important;
+}
+#amount_error{
+    margin-top:0.5em;
+}
+td form button {
+    margin: 0 .375em !important;
 }

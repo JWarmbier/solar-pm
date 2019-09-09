@@ -80,6 +80,39 @@ $(document).ready(function() {
     });
 });
 
+$(document).ready(function() {
+    $("#new-element-form").submit(function (e) {
+        e.preventDefault();
+
+        var obj = $(this), action = obj.attr('name'); /*Define variables*/
+        $.ajax({
+            type: "POST",
+            url: e.target.action,
+            data: obj.serialize() + "&Action=" + action,
+            cache: false,
+            success: function (JSON) {
+                if (JSON.error != '') {
+                    $("#" + action + " #display_error").show().html(JSON.error);
+                } else {
+                    window.location.href = "list-of-elements.php";
+                }
+            }
+        });
+    });
+});
+$("#amount").keyup(function (e){
+    var val = $(this).val();
+
+    if(val.length == 0  || (!isNaN(val) && val.length > 0) ){
+        $("#amount_error").hide();
+        if(!Number.isInteger(Number(val))){
+            $("#amount_error").show();
+        }
+    } else if (isNaN(val)){
+        $("#amount_error").show();
+    }
+});
+
 $("#menu-toggle").click(function(e) {
     e.preventDefault();
     $("#wrapper").toggleClass("toggled");
