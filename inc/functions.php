@@ -376,3 +376,75 @@ function removeProject($con, $project_id){
     $con->query("DELETE FROM solar_projectsusers WHERE project_id=".$project['ID']);
     $con->query("DELETE FROM solar_projects WHERE ID=".$project['ID']);
 }
+
+/* Display list of elemetens */
+
+
+
+function descriptionOfElements($con){
+    $result = $con->query("SELECT E.*, EC.* FROM solar_elements E LEFT JOIN solar_elementscategories EC ON E.el_category_id=EC.category_id");
+
+    if($result->num_rows > 0){
+        while($element = $result->fetch_assoc()){
+            ?>
+            <div class="div-element" id="element-id-<?php echo $element['element_id'] ?>">
+                <input type="hidden" id="name" value="<?php echo $element['el_name'];?>">
+                 <p> <b>Parametr: </b> <?php echo $element['el_parameter']; ?></p>
+                 <input type="hidden" id="parameter" value="<?php echo $element['el_parameter'];?>">
+                 <p> <b>Dostępność:</b> <?php echo $element ['el_amount']; ?></p>
+                 <input type="hidden" id="amount" value="<?php echo $element['el_amount'];?>">
+                 <p> <b>Kategoria:</b> <?php echo $element['category_name'];?> </p>
+                 <input type="hidden" id="category" value="<?php echo $element['category_name'];?>">
+                 <a href="<?php echo $element['datasheet'] ?>" class="btn btn-primary btn-sm">Dokumentacja</a>
+                 <input type="hidden" id="datasheet" value="<?php echo $element['datasheet'];?>">
+            </div>
+            <?php
+        }
+    }
+}
+
+function getProjectElements($con, $project_id){
+        $result = $con->query("SELECT E.*, PE.*, C.* FROM solar_elements E LEFT JOIN solar_projectselements PE ON E.element_id=PE.element_id LEFT JOIN solar_elementscategories C ON C.category_id=E.el_category_id WHERE PE.project_id=".$project_id);
+
+    return $result;
+}
+function getProjectElementsArray($con, $project_id){
+    $result = $con->query("SELECT E.*, PE.*, C.* FROM solar_elements E LEFT JOIN solar_projectselements PE ON E.element_id=PE.element_id LEFT JOIN solar_elementscategories C ON C.category_id=E.el_category_id WHERE PE.project_id=".$project_id);
+    $res = array();
+    if($result->num_rows >0){
+        while($element = $result->fetch_assoc()){
+            array_push($res, $element);
+        }
+    }
+    return $res;
+}
+
+function listOfElements($con, $project_id = -1){
+    $result = $con->query("SELECT E.*, EC.* FROM solar_elements E LEFT JOIN solar_elementscategories EC ON E.el_category_id=EC.category_id");
+    $current = array();
+    if($project_id != -1) {
+        $current = getProjectElementsArray($con, $project_id);
+    }
+    if($result->num_rows > 0){
+        while($element = $result->fetch_assoc()){
+            $notExist = true;
+             for($i = 0; $i < count($current); $i++){
+                 if($current[$i]['element_id'] == $element['element_id'])
+                     $notExist = false;
+             }
+            if($notExist){
+                echo '<option value="'.$element['element_id'].'">';
+                echo $element['el_name']." - ".$element['el_parameter'];
+                echo '</option>';                }
+
+        }
+    }
+
+}
+
+function checkIfLogged(){
+    if(!isset($_SESSION['UserData']['user_id'])){
+        header("Location: ./main.php",true, 301);
+
+    }
+}

@@ -61,8 +61,17 @@ $tmp = getUserData($con, $_SESSION['UserData']['user_id']);
                 <?php
             }
             ?>
-
-
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" id="final-panel" data-toggle="dropdown"
+                   aria-haspopup="true" aria-expanded="false">Zaliczenie
+                </a>
+                <div class="dropdown-menu dropdown-default" aria-labelledby="navbarDropdownMenuLink-333">
+                    <a class="dropdown-item" href="maths.php">MathJax</a>
+                    <a class="dropdown-item" href="media.php">Media</a>
+                    <a class="dropdown-item" href="drag-and-drop.php">Drag&Drop</a>
+                    <a class="dropdown-item" href="canvas.php">Canvas</a>
+                </div>
+            </li>
         </ul>
         <ul class="navbar-nav ml-auto nav-flex-icons">
             <li class="nav-item dropdown">

@@ -37,7 +37,7 @@ if(isset($_POST['project_id'])) {
                     }
                 }
                 ?>
-                <form action="submit.php" method="post" name="new-project-form" id="new-project-form">
+                <form action="submit.php" method="post" name="update-project-form" id="update-project-form">
                     <div class="form-group">
                         <h2 class="h2-responsive font-weight-light">Akutalizacja danych aktulanego projektu</h2>
                         <hr>
@@ -78,17 +78,59 @@ if(isset($_POST['project_id'])) {
                                             <?php
                                         }
                                     ?>
-
-
                         </ul>
                         <button type="button" class="btn btn-primary btn float-right" data-toggle="modal"
                                 data-target="#new-person">Dodaj osobę
                         </button>
                     </div>
+                    <div class="form-group clearfix">
+                        <label for="projects-elements">Lista części:</label>
+                        <table class="table table-striped">
+                            <thead>
+                            <tr>
+                                <th scope="col">Nazwa</th>
+                                <th scope="col">Parametr</th>
+                                <th scope="col">Dostępność [szt.]</th>
+                                <th scope="col">Kategoria</th>
+                                <th scope="col">Dokumentacja</th>
+                                <th scope="col">Zapotrzebowanie</th>
+                            </tr>
+                            </thead>
+                            <tbody id="table-list-of-elements">
+                            <?php
+                                $elemetns = getProjectElements($con, $_POST['project_id']);
+                                if($elemetns->num_rows > 0 );
+                            {
+                                while($element = $elemetns->fetch_assoc()){
+                                    ?>
+                                    <tr>
+                                        <td><?php echo $element['el_name'];?></td>
+                                        <td><?php echo $element['el_parameter'];?></td>
+                                        <td><?php echo $element['el_amount'];?></td>
+                                        <td><?php echo $element['category_name'];?></td>
+                                        <td> <a href="<?php echo $element['datasheet'];?>" class="btn btn-primary btn-sm">Dokumentacja</a></td>
+                                        <td><input type="hidden" name="elements[]" value="<?php echo $element['element_id'];?>">
+                                            <input type="number" pattern="^[0-9]" name="amountOfElements[]" value="<?php echo $element['amount']?>">
+                                        </td>
+                                    </tr>
+
+                                    <?php
+                                }
+                            }
+                            ?>
+
+                            </tbody>
+                        </table>
+
+                        <button type="button" class="btn btn-primary btn float-right" data-toggle="modal"
+                                data-target="#new-element">Dodaj część
+                        </button>
+                    </div>
                     <div id="display_error" class="alert alert-danger alert-dismissible fade show"></div>
                     <div class="form-group clearfix">
+                        <input type="hidden" name="project_id" value="<?php echo $project['ID']; ?>">
                         <input type="submit" class="btn btn-lg btn-success btn-block float-right"
-                               value="Utwórz projekt">
+                               value="Aktualizuj">
                     </div>
                 </form>
             </div>
@@ -126,6 +168,44 @@ if(isset($_POST['project_id'])) {
                 </div>
             </div>
             <!-- /Add users responsible for project -->
+            <!-- Add elements to projects -->
+            <div class="modal fade" role="dialog" id="new-element">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <!-- HTML Form -->
+                        <form action="submit.php" method="post" name="password_form" id="password_form"
+                              autocomplete="off">
+                            <div class="modal-header">
+                                <h4 class="modal-title">Dodawanie części</h4>
+                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            </div>
+                            <!-- Modal Body -->
+                            <div class="modal-body">
+                                <div class="form-group clearfix">
+                                    <label for="person">Wybierz część:</label>
+                                    <select class="form-control custom-select float-right" name="person" id="select-element">
+                                        <?php
+                                            listOfElements($con, $_POST['project_id']);
+                                        ?>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <?php descriptionOfElements($con);?>
+                                </div>
+
+                            </div>
+                            <!-- Modal Footer -->
+                            <div class="modal-footer">
+                                <input type="button" class="btn btn-lg btn-success" value="Dodaj" id="btn-add-element">
+                                <button type="button" class="btn  btn-lg  btn-default" data-dismiss="modal">Anuluj
+                                </button>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+            <!-- /Elements to project -->
         </div>
         <?php
     } else{
