@@ -22,12 +22,22 @@ function isAppended($con, $user_id){
     return false;
 }
 
-function showAllUsers($con, $user_id){
+function showAllUsers($con, $user_id, $current = array()){
     $result = $con->query("SELECT U.*, P.name, P.name, P.course, P.student_id, P.year, R.Title, S.RoleID FROM tbl_users U LEFT JOIN tbl_user_profile P ON U.user_ID=P.user_id LEFT JOIN solar_userroles S ON S.UserID=U.user_ID   LEFT JOIN solar_roles R ON R.ID=S.RoleID");
     if($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
-            if($user_id != $row['user_id'])
-            echo '<option value="'.$row['user_id'].'">'.$row['name'].'</option>';
+            $notExist = true;
+            for($i = 0; $i < count($current); $i++){
+                if($row['user_id'] == $current[$i]['user_id']){
+                    $notExist =false;
+                    break;
+                }
+            }
+
+            if($user_id != $row['user_id'] && $notExist)
+                    echo '<option value="'.$row['user_id'].'">'.$row['name'].'</option>';
+
+
         }
     }
 }
@@ -45,11 +55,13 @@ function output($Return=array()){
     exit(json_encode($Return));
 }
 /*Function to get list of roles*/
-function getDepartments($con){
+function getDepartments($con, $department_id = -1){
     $result = $con->query("SELECT * FROM departments");
     if($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
-            echo '<option value="'.$row['DepartmentID'].'">'.$row['DepartmentName'].'</option>';
+            echo '<option value="'.$row['DepartmentID'].'" ';
+            if($department_id != -1 && $department_id == $row['DepartmentID']) echo 'selected';
+            echo'>'.$row['DepartmentName'].'</option>';
         }
     }
 }
@@ -215,6 +227,15 @@ function showDescriptionOfUsers($con, $users){
         $i++;
     }
 }
+/*Fucntion to get all data on one projects */
+function getProject($con, $project_id){
+    $result = $con->query("SELECT  P.*, D.* FROM solar_projects P LEFT JOIN departments D ON D.DepartmentID= P.department_id WHERE P.ID=".$project_id);
+    if($result->num_rows==1){
+        return $result->fetch_assoc();
+    }else{
+        return FALSE;
+    }
+}
 
 /*Function to get data about projects from database*/
     function getMyProjects($con, $user_id){
@@ -289,6 +310,14 @@ function displayMyProjects($con, $user_id){
                             }
                         ?>
                     </ul>
+                    <form action="my-projects.php" method="post">
+                        <input type="hidden" name="project_id" value="<?php echo $myProjects[$i]['ID'] ?>">
+                        <button type="submit" class="btn btn-primary btn-sm float-right" name="action" value="remove-project">Usuń projekt</button>
+                    </form>
+                    <form action="edit-project.php" method="post">
+                        <input type="hidden" name="project_id" value="<?php echo $myProjects[$i]['ID'] ?>">
+                        <button type="submit" class="btn btn-primary btn-sm float-right" name="action" value="edit-project">Edytuj projekt</button>
+                    </form>
                 </div>
             </div>
         </div>
@@ -337,4 +366,13 @@ function getSpecificElement($con, $element_id){
     }else{
         return false;
     }
+}
+
+/*Function to remove specific project */
+
+function removeProject($con, $project_id){
+    $project = getProject($con, $project_id);
+    print_r($project);
+    $con->query("DELETE FROM solar_projectsusers WHERE project_id=".$project['ID']);
+    $con->query("DELETE FROM solar_projects WHERE ID=".$project['ID']);
 }

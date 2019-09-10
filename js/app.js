@@ -151,15 +151,34 @@ $("#btn-add-person").click(function(e){
 
     var liNode = document.createElement("li");
     var inputNode = document.createElement("input");
+    var btn = document.createElement("button");
+    var pTag = document.createElement("p");
+
+    btn.type = "button";
+    btn.classList.add("btn");
+    btn.value = person.value;
+    btn.innerHTML = "Usuń";
+    btn.classList.add("btn");
+    btn.classList.add("btn-primary");
+    btn.classList.add("btn-sm");
+    btn.classList.add("float-right");
+    btn.classList.add("btn-remove-person");
+    btn.addEventListener("click",btnRemovePerson);
+
+    pTag.id = "p-coworker-id-" + person.value;
+    pTag.innerHTML = person.innerHTML;
+    pTag.classList.add("float-left");
 
     inputNode.type = "hidden";
     inputNode.name = "coworker[]";
     inputNode.value = person.value;
 
+    liNode.id = "li-coworker-id-" + person.value;
     liNode.classList.add("list-group-item");
-    liNode.innerHTML = person.innerHTML;
 
+    liNode.appendChild(pTag);
     liNode.appendChild(inputNode);
+    liNode.appendChild(btn);
 
     list.appendChild(liNode);
 
@@ -167,3 +186,19 @@ $("#btn-add-person").click(function(e){
 
     $('#new-person').modal('hide');
 });
+
+$(".btn-remove-person").click(btnRemovePerson);
+
+
+function btnRemovePerson(e){
+    var li = document.getElementById("li-coworker-id-"+$(this).val());
+    var p = document.getElementById("p-coworker-id-"+$(this).val());
+    var selectList = document.getElementById("select-person");
+
+    var option = document.createElement("option");
+    option.value = $(this).val();
+    option.innerHTML = p.innerHTML;
+
+    selectList.appendChild(option);
+    li.remove();
+}
