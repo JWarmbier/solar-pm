@@ -2,8 +2,9 @@
 
 /*Function to get users data*/
 function getUserData($con, $user_id){
-$result = $con->query("SELECT U.*, P.name, P.name, P.course, P.student_id, P.year, R.Title, S.RoleID FROM tbl_users U LEFT JOIN tbl_user_profile P ON U.user_ID=P.user_id LEFT JOIN solar_userroles S ON S.UserID=U.user_ID   LEFT JOIN solar_roles R ON R.ID=S.RoleID WHERE U.user_id='$user_id' LIMIT 1");
-    if($result->num_rows==1){
+    echo $user_id;
+    $result = $con->query("SELECT U.*, P.name, P.name, P.course, P.student_id, P.year, R.Title, S.RoleID FROM tbl_users U LEFT JOIN tbl_user_profile P ON U.user_ID=P.user_id LEFT JOIN solar_userroles S ON S.UserID=U.user_ID   LEFT JOIN solar_roles R ON R.ID=S.RoleID WHERE U.user_id=".$user_id);
+    if($result->num_rows == 1){
         return $result->fetch_assoc();
     }else{
     	return FALSE;

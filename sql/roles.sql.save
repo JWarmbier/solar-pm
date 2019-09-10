@@ -4,7 +4,7 @@ CREATE TABLE roles (
         PRIMARY KEY (ID)
 );
 
-INSERT INTOro departments(Name) VALUES ('Członek');
+INSERT INTO departments(Name) VALUES ('Członek');
 INSERT INTO departments(Name) VALUES ('Lider');
 INSERT INTO departments(Name) VALUES ('Koordynator');
 INSERT INTO departments(Name) VALUES ('Inny');

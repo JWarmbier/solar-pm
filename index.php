@@ -14,7 +14,6 @@ require('include/menu.php');
 require_once 'PhpRbac/src/PhpRbac/Rbac.php';
 $rbac = new PhpRbac\Rbac();
 
-
 ?>
 
 

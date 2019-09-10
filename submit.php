@@ -86,11 +86,9 @@ if(!empty($_POST) && $_POST['Action']=='registration_form'){
         $Return['error'] = "";
     }
 
-
     if($Return['error']!=''){
         output($Return);
     }
-
     /* Check Email existence in DB */
     $result = $con->query("SELECT * FROM tbl_users WHERE email='$email' LIMIT 1");
     if($result->num_rows==1){
