@@ -93,3 +93,50 @@ label{
 td form button {
     margin: 0 .375em !important;
 }
+.div-element{
+    margin-top: 1em;
+}
+
+@media screen and (max-width: 990px) {
+    #fourier{
+        display:none;
+    }
+}
+
+#div1 {
+    width: 350px;
+    height: 70px;
+    padding: 10px;
+    border: 1px solid #aaaaaa;
+}
+#firstDigit, #operationSign, #secondDigit,#equalSign{
+    display:block;
+    float:left;
+    line-height: 100px;
+    height: 100px;
+    width: 100px;
+    text-align:center;
+    font-size: 80px;
+}
+
+#equationResult{
+    display: inline-block;
+    width: 100px;
+    height: 100px;
+    border: 1px solid #aaaaaa;
+}
+#clr{
+    clear: both;
+}
+#ans1, #ans2, #ans3{
+    text-align:center;
+    font-size: 80px;
+}
+#container1, #container2, #container3{
+    display: block;
+    float :left;
+    width:100px;
+    height: 100px;
+    border: 1px solid #aaaaaa;
+
+}

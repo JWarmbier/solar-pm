@@ -34,6 +34,7 @@ if(!empty($_POST) && $_POST['Action']=='login_form'){
         $row = $result->fetch_assoc();
         /* Success: Set session variables and redirect to Protected page */
         $user = getUserData($con, $row['user_id']);
+        $_SESSION['timestamp'] = time();
         $Return['result'] = $_SESSION['UserData'] = array('user_id'=>$row['user_id'], 'name' => $user['name']);
     } else {
         /* Unsuccessful attempt: Set error message */
@@ -102,6 +103,7 @@ if(!empty($_POST) && $_POST['Action']=='registration_form'){
         $con->query( "INSERT INTO `tbl_user_profile` (user_id,name, course, student_id, role_id, year) VALUES('$user_id','$name','$course','$studentID','$department','$year' )");
         /* Success: Set session variables and redirect to Protected page */
         $Return['result'] = $_SESSION['UserData'] = array('user_id'=>$user_id, 'name'=>$name);
+        $_SESSION['timestamp'] = time();
         $rbac->Users->assign($department, $user_id);
     }
     /*Return*/
@@ -183,6 +185,48 @@ if(!empty($_POST) && $_POST['Action']=='new-project-form'){
     output($Return);
 }
 
+if(!empty($_POST) && $_POST['Action']=='update-project-form'){
+    $Return = array('result'=>array(), 'error'=>'');
+
+    $id = safeInput ($con, $_POST['project_id']);
+    $title = safeInput($con, $_POST['title']);
+    $description = safeInput($con, $_POST['description']);
+    $author = safeInput($con, $_POST['author']);
+    $department = safeInput($con, $_POST['department']);
+
+    $coworkers = null;
+    if(isset($_POST['coworker']))
+        $coworkers =  $_POST['coworker'];
+    if( $title === '' or strlen($title) < 6 ){
+        $Return['error'] = "Tytuł musi mieć przynajmniej 5 znaków.";
+    } elseif ($description === '' or strlen($description) < 21) {
+        $Return['error'] = "Opis musi mieć przynajmniej 20 znaków.";
+    }
+
+    if($Return['error'] == ''){
+        $con->query("UPDATE solar_projects SET name ='$title', description='$description', department_id='$department' WHERE ID=".$id);
+        $con->query("DELETE FROM solar_projectusers WHERE project_id=".$id);
+
+        if($coworkers != null){
+            for($i=0; $i < count($coworkers) ; $i++){
+                $con->query("INSERT INTO solar_projectsusers (project_id, user_id) VALUES ('$id','$coworkers[$i]')");
+            }
+        }
+    }
+    if(isset($_POST['amountOfElements']) && isset($_POST['elements'])){
+        $con->query("DELETE FROM solar_projectselements WHERE project_id=".$id);
+        $amountOfElemetns = $_POST['amountOfElements'];
+        $elements = $_POST['elements'];
+        for($i = 0; $i < count($amountOfElemetns); $i++){
+            if($amountOfElemetns[$i] != 0){
+                $con->query("INSERT INTO solar_projectselements (project_id, element_id, amount) VALUES ('$id','$elements[$i]','$amountOfElemetns[$i]')");
+            }
+        }
+    }
+
+    output($Return);
+}
+
 if(!empty($_POST) && $_POST['Action']=='new-element-form'){
     $Return = array('result'=>array(), 'error'=>'');
 
@@ -203,8 +247,43 @@ if(!empty($_POST) && $_POST['Action']=='new-element-form'){
     } elseif (strlen($datasheet) < 3){
         $Return['error'] = "Wpisz link do dokumentacji.";
     }
+
     if($Return['error'] == ''){
         $con->query("INSERT INTO solar_elements(el_name, el_parameter, el_amount, el_category_id, datasheet) VALUeS ('$name','$parameter','$amount','$category','$datasheet')");
+    }
+    output($Return);
+}
+
+if(!empty($_POST) && $_POST['Action']=='edit-element-form'){
+    $Return = array('result'=>array(), 'error'=>'');
+
+
+    $element_id = safeInput($con, $_POST['element_id']);
+    $name = safeInput($con, $_POST['el_name']);
+    $category = safeInput($con, $_POST['category']);
+    $parameter = safeInput($con, $_POST['el_parameter']);
+    $amount = safeInput($con, $_POST['el_amount']);
+    $datasheet = safeInput($con, $_POST['datasheet']);
+
+    $res = $con->query("SELECT * FROM solar_elements WHERE element_id=".$element_id);
+
+    if($res->num_rows == 0){
+        $Return[''] = "Nie istnieje już taki element w bazie danych";
+    }
+    elseif( $name === '' or strlen($name) < 3 ){
+        $Return['error'] = "Tytuł musi mieć przynajmniej 2 znaków.";
+    } elseif ($category === '' ) {
+        $Return['error'] = "Kategoria nie została wybrana";
+    } elseif($parameter === ''){
+        $Return['error'] = "Nie wpisano parametru.";
+    }elseif (!preg_match("/^[0-9]/",$amount) or $amount === ''){
+        $Return['error'] = "Ilość musi być liczbą całkowitą";
+    } elseif (strlen($datasheet) < 3){
+        $Return['error'] = "Wpisz link do dokumentacji.";
+    }
+
+    if($Return['error'] == ''){
+        $con->query ("UPDATE solar_elements SET el_name='$name', el_parameter='$parameter', el_category_id='$category', datasheet='$datasheet', el_amount='$amount' WHERE element_id=".$element_id);
     }
     output($Return);
 }

@@ -2,9 +2,14 @@
 
 /*Function to get users data*/
 function getUserData($con, $user_id){
+<<<<<<< HEAD
     echo $user_id;
     $result = $con->query("SELECT U.*, P.name, P.name, P.course, P.student_id, P.year, R.Title, S.RoleID FROM tbl_users U LEFT JOIN tbl_user_profile P ON U.user_ID=P.user_id LEFT JOIN solar_userroles S ON S.UserID=U.user_ID   LEFT JOIN solar_roles R ON R.ID=S.RoleID WHERE U.user_id=".$user_id);
     if($result->num_rows == 1){
+=======
+    $result = $con->query("SELECT U.*, P.name, P.name, P.course, P.student_id, P.year, R.Title, S.RoleID FROM tbl_users U LEFT JOIN tbl_user_profile P ON U.user_ID=P.user_id LEFT JOIN solar_userroles S ON S.UserID=U.user_ID   LEFT JOIN solar_roles R ON R.ID=S.RoleID WHERE U.user_id='$user_id' LIMIT 1");
+    if($result->num_rows==1){
+>>>>>>> projects-with-parts
         return $result->fetch_assoc();
     }else{
     	return FALSE;
@@ -23,12 +28,22 @@ function isAppended($con, $user_id){
     return false;
 }
 
-function showAllUsers($con, $user_id){
+function showAllUsers($con, $user_id, $current = array()){
     $result = $con->query("SELECT U.*, P.name, P.name, P.course, P.student_id, P.year, R.Title, S.RoleID FROM tbl_users U LEFT JOIN tbl_user_profile P ON U.user_ID=P.user_id LEFT JOIN solar_userroles S ON S.UserID=U.user_ID   LEFT JOIN solar_roles R ON R.ID=S.RoleID");
     if($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
-            if($user_id != $row['user_id'])
-            echo '<option value="'.$row['user_id'].'">'.$row['name'].'</option>';
+            $notExist = true;
+            for($i = 0; $i < count($current); $i++){
+                if($row['user_id'] == $current[$i]['user_id']){
+                    $notExist =false;
+                    break;
+                }
+            }
+
+            if($user_id != $row['user_id'] && $notExist)
+                    echo '<option value="'.$row['user_id'].'">'.$row['name'].'</option>';
+
+
         }
     }
 }
@@ -46,11 +61,13 @@ function output($Return=array()){
     exit(json_encode($Return));
 }
 /*Function to get list of roles*/
-function getDepartments($con){
+function getDepartments($con, $department_id = -1){
     $result = $con->query("SELECT * FROM departments");
     if($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
-            echo '<option value="'.$row['DepartmentID'].'">'.$row['DepartmentName'].'</option>';
+            echo '<option value="'.$row['DepartmentID'].'" ';
+            if($department_id != -1 && $department_id == $row['DepartmentID']) echo 'selected';
+            echo'>'.$row['DepartmentName'].'</option>';
         }
     }
 }
@@ -81,15 +98,16 @@ function getAllRoles($con, $myRole){
 }
 
 /*Get list of categories of elemnts*/
-function getCategories($con){
+function getCategories($con, $selected_id = -1){
     $res =$con->query("SELECT * FROM solar_elementscategories");
     if($res->num_rows >0){
         while($row = $res->fetch_assoc()){
-            echo '<option value="'.$row['category_id'].'">'.$row['category_name'].'</option>';
+            echo '<option value="'.$row['category_id'].'"';
+            if ($selected_id != -1 && $selected_id == $row['category_id']) echo " selected";
+            echo '>'.$row['category_name'].'</option>';
         }
     }
 }
-
 
 /*Function to check if the department exists */
 function isDepartmentID($con, $departmentID){
@@ -215,6 +233,15 @@ function showDescriptionOfUsers($con, $users){
         $i++;
     }
 }
+/*Fucntion to get all data on one projects */
+function getProject($con, $project_id){
+    $result = $con->query("SELECT  P.*, D.* FROM solar_projects P LEFT JOIN departments D ON D.DepartmentID= P.department_id WHERE P.ID=".$project_id);
+    if($result->num_rows==1){
+        return $result->fetch_assoc();
+    }else{
+        return FALSE;
+    }
+}
 
 /*Function to get data about projects from database*/
     function getMyProjects($con, $user_id){
@@ -289,6 +316,14 @@ function displayMyProjects($con, $user_id){
                             }
                         ?>
                     </ul>
+                    <form action="my-projects.php" method="post">
+                        <input type="hidden" name="project_id" value="<?php echo $myProjects[$i]['ID'] ?>">
+                        <button type="submit" class="btn btn-primary btn-sm float-right" name="action" value="remove-project">Usuń projekt</button>
+                    </form>
+                    <form action="edit-project.php" method="post">
+                        <input type="hidden" name="project_id" value="<?php echo $myProjects[$i]['ID'] ?>">
+                        <button type="submit" class="btn btn-primary btn-sm float-right" name="action" value="edit-project">Edytuj projekt</button>
+                    </form>
                 </div>
             </div>
         </div>
@@ -309,12 +344,15 @@ function getAllElements($con){
                 echo '<td> '.$element['category_name'].'</td>';
                 echo '<td> <a href="'.$element['datasheet'].'" class="btn btn-primary btn-sm">Dokumentacja</a></td>';
                 ?>
-
                 <td>
-                <form class="element-action" id="element-<?php echo $element['element_id']; ?>" action="list-of-elements.php" method="post">
-                    <input type="hidden" name="element_id" value="<?php echo $element['element_id']; ?>">
-                    <button type="submit" class="btn btn-primary btn-sm" name="action" value="remove-element">Usuń</button>
-                </form>
+                    <form class="element-action float-left" id="element-<?php echo $element['element_id']; ?>" action="edit-element.php" method="post">
+                        <input type="hidden" name="element_id" value="<?php echo $element['element_id']; ?>">
+                        <button type="submit" class="btn btn-primary btn-sm" name="action" value="remove-element">Edytuj</button>
+                    </form>
+                    <form class="element-action float-left" id="element-<?php echo $element['element_id']; ?>" action="list-of-elements.php" method="post">
+                        <input type="hidden" name="element_id" value="<?php echo $element['element_id']; ?>">
+                        <button type="submit" class="btn btn-primary btn-sm" name="action" value="remove-element">Usuń</button>
+                    </form>
                 </td>
                 </tr>
                 <?php
@@ -325,4 +363,94 @@ function getAllElements($con){
 
 function removeElement($con, $element_id){
     $con->query("DELETE FROM solar_elements WHERE element_id=".$element_id);
+}
+
+function getSpecificElement($con, $element_id){
+    $result = $con->query("SELECT * FROM solar_elements WHERE element_id=".$element_id);
+    if($result->num_rows==1){
+        return $result->fetch_assoc();
+    }else{
+        return false;
+    }
+}
+
+/*Function to remove specific project */
+
+function removeProject($con, $project_id){
+    $project = getProject($con, $project_id);
+    print_r($project);
+    $con->query("DELETE FROM solar_projectsusers WHERE project_id=".$project['ID']);
+    $con->query("DELETE FROM solar_projects WHERE ID=".$project['ID']);
+}
+
+/* Display list of elemetens */
+
+
+
+function descriptionOfElements($con){
+    $result = $con->query("SELECT E.*, EC.* FROM solar_elements E LEFT JOIN solar_elementscategories EC ON E.el_category_id=EC.category_id");
+
+    if($result->num_rows > 0){
+        while($element = $result->fetch_assoc()){
+            ?>
+            <div class="div-element" id="element-id-<?php echo $element['element_id'] ?>">
+                <input type="hidden" id="name" value="<?php echo $element['el_name'];?>">
+                 <p> <b>Parametr: </b> <?php echo $element['el_parameter']; ?></p>
+                 <input type="hidden" id="parameter" value="<?php echo $element['el_parameter'];?>">
+                 <p> <b>Dostępność:</b> <?php echo $element ['el_amount']; ?></p>
+                 <input type="hidden" id="amount" value="<?php echo $element['el_amount'];?>">
+                 <p> <b>Kategoria:</b> <?php echo $element['category_name'];?> </p>
+                 <input type="hidden" id="category" value="<?php echo $element['category_name'];?>">
+                 <a href="<?php echo $element['datasheet'] ?>" class="btn btn-primary btn-sm">Dokumentacja</a>
+                 <input type="hidden" id="datasheet" value="<?php echo $element['datasheet'];?>">
+            </div>
+            <?php
+        }
+    }
+}
+
+function getProjectElements($con, $project_id){
+        $result = $con->query("SELECT E.*, PE.*, C.* FROM solar_elements E LEFT JOIN solar_projectselements PE ON E.element_id=PE.element_id LEFT JOIN solar_elementscategories C ON C.category_id=E.el_category_id WHERE PE.project_id=".$project_id);
+
+    return $result;
+}
+function getProjectElementsArray($con, $project_id){
+    $result = $con->query("SELECT E.*, PE.*, C.* FROM solar_elements E LEFT JOIN solar_projectselements PE ON E.element_id=PE.element_id LEFT JOIN solar_elementscategories C ON C.category_id=E.el_category_id WHERE PE.project_id=".$project_id);
+    $res = array();
+    if($result->num_rows >0){
+        while($element = $result->fetch_assoc()){
+            array_push($res, $element);
+        }
+    }
+    return $res;
+}
+
+function listOfElements($con, $project_id = -1){
+    $result = $con->query("SELECT E.*, EC.* FROM solar_elements E LEFT JOIN solar_elementscategories EC ON E.el_category_id=EC.category_id");
+    $current = array();
+    if($project_id != -1) {
+        $current = getProjectElementsArray($con, $project_id);
+    }
+    if($result->num_rows > 0){
+        while($element = $result->fetch_assoc()){
+            $notExist = true;
+             for($i = 0; $i < count($current); $i++){
+                 if($current[$i]['element_id'] == $element['element_id'])
+                     $notExist = false;
+             }
+            if($notExist){
+                echo '<option value="'.$element['element_id'].'">';
+                echo $element['el_name']." - ".$element['el_parameter'];
+                echo '</option>';                }
+
+        }
+    }
+
+}
+
+function checkIfLogged(){
+    if(!isset($_SESSION['UserData']['user_id'])){
+        header("Location: ./main.php",true, 301);
+
+    }
 }

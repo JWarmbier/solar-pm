@@ -14,24 +14,29 @@ require('include/menu.php');
 require_once 'PhpRbac/src/PhpRbac/Rbac.php';
 $rbac = new PhpRbac\Rbac();
 
-
 ?>
-
-
     <!-- container -->
     <div class="container">
-
-
         <div class="div-my-projects">
+            <?php
+            if(isset($_POST['action'])) {
+                if ($_POST['action'] == 'remove-project') {
+                    removeProject($con, $_POST['project_id']);
+                    ?>
+                    <div class="alert alert-success" role="alert">
+                        Udało się usunać projekt.
+                    </div>
+                    <?php
+                }
+            }
+            ?>
         <h2 class="h2-responsive font-weight-light">Moje projekty</h2>
             <div id="accordion">
                 <?php
-                displayMyProjects($con, $_SESSION['UserData']['user_id']);
+                    displayMyProjects($con, $_SESSION['UserData']['user_id']);
                 ?>
             </div>
         </div>
     </div>
-
-
     <!-- /container -->
 <?php require('include/footer.php');?>
